@@ -29,7 +29,7 @@ app.get("/", async (req, res) =>
     const result = await db.query("SELECT * FROM items ORDER BY id ASC");
     items = result.rows;
 
-    console.log(items);
+   console.log("items onload", items);
 
     res.render("index.ejs", {
       listTitle: "Today",
@@ -45,14 +45,37 @@ app.post("/add", async (req, res) =>
 {
   const item = req.body.newItem;
   items.push({ title: item });
+  console.log("added", item);
 
-
- await db.query('INSERT INTO items(title) VALUES($1)', [item]);
-      
-  res.redirect("/");
+    try
+    {
+    await db.query('INSERT INTO items(title) VALUES($1)', [item]);
+    res.redirect("/");
+    }
+    catch (err)
+    {
+      console.log(err);
+    }     
+  
 });
 
-app.post("/edit", (req, res) => {});
+app.post("/edit", async (req, res) =>
+{
+  const item = req.body.updatedItemTitle;
+  const id = req.body.updatedItemId;
+
+  console.log("edited", item, id);
+    try
+    {
+        await db.query("UPDATE items SET title = ($1) WHERE id = $2", [item, id]);
+      res.redirect("/");
+    } catch (err)
+    {
+      console.log(err);
+    }  
+  
+
+});
 
 app.post("/delete", (req, res) => {});
 

@@ -29,6 +29,8 @@ app.get("/", async (req, res) =>
     const result = await db.query("SELECT * FROM items ORDER BY id ASC");
     items = result.rows;
 
+    console.log(items);
+
     res.render("index.ejs", {
       listTitle: "Today",
       listItems: items,
@@ -39,9 +41,14 @@ app.get("/", async (req, res) =>
   }
 });
 
-app.post("/add", (req, res) => {
+app.post("/add", async (req, res) =>
+{
   const item = req.body.newItem;
   items.push({ title: item });
+
+
+ await db.query('INSERT INTO items(title) VALUES($1)', [item]);
+      
   res.redirect("/");
 });
 
